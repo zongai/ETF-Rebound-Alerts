@@ -10,11 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install --legacy-peer-deps
-      - run: npx wrangler deploy
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Inject D1 database_id from repository variable
+        env:
+          D1_DATABASE_ID: ${{ vars.D1_DATABASE_ID }}
+        run: |
+          if [ -z "$D1_DATABASE_ID" ]; then
+            echo "::error::Repository variable D1_DATABASE_ID is not set. Add it under Settings → Secrets and variables → Actions → Variables."
+            exit 1
+          fi
+          sed -i "s/REPLACE_WITH_D1_DATABASE_ID/${D1_DATABASE_ID}/" wrangler.toml
+          grep database_id wrangler.toml
+
+      - name: Deploy Worker
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
