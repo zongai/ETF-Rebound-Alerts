@@ -19,12 +19,12 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Inject D1 database_id from repository variable
+      - name: Inject D1 database_id from repository secret
         env:
-          D1_DATABASE_ID: ${{ vars.D1_DATABASE_ID }}
+          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
         run: |
           if [ -z "$D1_DATABASE_ID" ]; then
-            echo "::error::Repository variable D1_DATABASE_ID is not set. Add it under Settings → Secrets and variables → Actions → Variables."
+            echo "::error::Repository secret D1_DATABASE_ID is not set. Add it under Settings → Secrets and variables → Actions → Secrets."
             exit 1
           fi
           sed -i "s/REPLACE_WITH_D1_DATABASE_ID/${D1_DATABASE_ID}/" wrangler.toml
