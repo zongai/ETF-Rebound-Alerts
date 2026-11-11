@@ -11,7 +11,7 @@ crons = ["15 8 * * MON-FRI"]
 [[d1_databases]]
 binding = "DB"
 database_name = "a-share-etf-alerts"
-database_id = "baf2648f-5710-45c3-bc5e-c4a8be6521f4"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
 
 [vars]
 TIMEZONE = "Asia/Shanghai"
