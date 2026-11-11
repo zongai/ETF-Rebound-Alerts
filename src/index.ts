@@ -1,14 +1,44 @@
-import type { Env, Kline } from "./types";
+import type { Env, Kline, WatchItem } from "./types";
 import { fetchKlines } from "./eastmoney";
 import { calculateIndicators, calculateWeekly } from "./indicators";
 import { sendBark } from "./bark";
 
-const WATCH = [
+/** Fallback when WATCHLIST env is missing or invalid. */
+const DEFAULT_WATCH: WatchItem[] = [
   { symbol: "510300", name: "沪深300ETF", secid: "1.510300" },
   { symbol: "510050", name: "上证50ETF", secid: "1.510050" },
   { symbol: "510500", name: "中证500ETF", secid: "1.510500" },
   { symbol: "159915", name: "创业板ETF", secid: "0.159915" }
 ];
+
+function getWatchlist(env: Env): WatchItem[] {
+  const raw = env.WATCHLIST?.trim();
+  if (!raw) return DEFAULT_WATCH;
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      console.error("WATCHLIST must be a non-empty JSON array; using default");
+      return DEFAULT_WATCH;
+    }
+    const list: WatchItem[] = [];
+    for (const row of parsed) {
+      if (!row || typeof row !== "object") continue;
+      const symbol = String((row as WatchItem).symbol || "").trim();
+      const name = String((row as WatchItem).name || symbol).trim();
+      const secid = String((row as WatchItem).secid || "").trim();
+      if (!symbol || !secid) continue;
+      list.push({ symbol, name, secid });
+    }
+    if (list.length === 0) {
+      console.error("WATCHLIST had no valid items; using default");
+      return DEFAULT_WATCH;
+    }
+    return list;
+  } catch (e) {
+    console.error("Failed to parse WATCHLIST JSON; using default", e);
+    return DEFAULT_WATCH;
+  }
+}
 
 function chinaDate(date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -30,16 +60,17 @@ function macdHistory(values: number[]): number[] {
   return dif.map((v, i) => 2 * (v - dea[i]));
 }
 
-function findWatch(symbol: string) {
-  return WATCH.find(x => x.symbol === symbol);
+function findWatch(watch: WatchItem[], symbol: string) {
+  return watch.find(x => x.symbol === symbol);
 }
 
 async function scan(env: Env): Promise<{ scanned: number; alerts: number; errors: string[] }> {
   const today = chinaDate();
   let scanned = 0, alerts = 0;
   const errors: string[] = [];
+  const watch = getWatchlist(env);
 
-  for (const item of WATCH) {
+  for (const item of watch) {
     try {
       const [daily, weekly, monthly] = await Promise.all([
         fetchKlines(item.symbol, item.secid, "20180101", "20500101", "101", "1200"),
@@ -190,14 +221,14 @@ async function registerPosition(request: Request, env: Env): Promise<Response> {
     symbol?: string; entry_date?: string; entry_price?: number; quantity?: number;
   };
   const symbol = String(body.symbol || "");
-  if (!findWatch(symbol)) return Response.json({ error: "symbol not in watchlist" }, { status: 400 });
+  const watch = getWatchlist(env);
+  const item = findWatch(watch, symbol);
+  if (!item) return Response.json({ error: "symbol not in watchlist" }, { status: 400 });
   if (!body.entry_date || !/^\d{4}-\d{2}-\d{2}$/.test(body.entry_date)
       || !Number.isFinite(body.entry_price) || Number(body.entry_price) <= 0
       || !Number.isInteger(body.quantity) || Number(body.quantity) <= 0) {
     return Response.json({ error: "Required: symbol, entry_date YYYY-MM-DD, positive entry_price, positive integer quantity" }, { status: 400 });
   }
-
-  const item = findWatch(symbol)!;
   const daily = await fetchKlines(item.symbol, item.secid);
   const ind = calculateIndicators(daily);
   const entry = Number(body.entry_price);

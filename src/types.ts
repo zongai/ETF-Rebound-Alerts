@@ -1,7 +1,15 @@
+export interface WatchItem {
+  symbol: string;
+  name: string;
+  secid: string;
+}
+
 export interface Env {
   DB: D1Database;
   BARK_DEVICE_KEY: string;
   BARK_BASE_URL?: string;
+  /** JSON array of {symbol,name,secid}. Example set in wrangler.toml [vars] or CF dashboard. */
+  WATCHLIST?: string;
   TIMEZONE?: string;
   MAX_POSITION_PCT?: string;
   RISK_PER_TRADE_PCT?: string;

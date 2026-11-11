@@ -20,3 +20,6 @@ MAX_POSITION_PCT = "0.60"
 RISK_PER_TRADE_PCT = "0.005"
 MAX_HOLDING_DAYS = "20"
 ENTRY_COOLDOWN_DAYS = "3"
+# JSON array: [{symbol,name,secid}, ...]. SSE=1.xxxxx, SZSE=0.xxxxx
+# Override anytime in CF Dashboard → Worker → Settings → Variables without redeploying code.
+WATCHLIST = '[{"symbol":"510300","name":"沪深300ETF","secid":"1.510300"},{"symbol":"510050","name":"上证50ETF","secid":"1.510050"},{"symbol":"510500","name":"中证500ETF","secid":"1.510500"},{"symbol":"159915","name":"创业板ETF","secid":"0.159915"}]'
