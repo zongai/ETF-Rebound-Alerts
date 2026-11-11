@@ -1,0 +1,3 @@
+BARK_DEVICE_KEY=replace_with_your_private_bark_device_key
+# Optional. Bark server defaults to https://api.day.app
+BARK_BASE_URL=https://api.day.app

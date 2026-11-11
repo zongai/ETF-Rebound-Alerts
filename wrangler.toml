@@ -1,0 +1,22 @@
+name = "a-share-etf-rebound-alerts"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+# Cloudflare Cron uses UTC. 08:15 UTC = 16:15 China Standard Time.
+# Weekdays only; the worker also checks the exchange calendar / data availability.
+[triggers]
+crons = ["15 8 * * MON-FRI"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "a-share-etf-alerts"
+database_id = "baf2648f-5710-45c3-bc5e-c4a8be6521f4"
+
+[vars]
+TIMEZONE = "Asia/Shanghai"
+# Initial paper-trading configuration. No automatic orders are placed.
+MAX_POSITION_PCT = "0.60"
+RISK_PER_TRADE_PCT = "0.005"
+MAX_HOLDING_DAYS = "20"
+ENTRY_COOLDOWN_DAYS = "3"
