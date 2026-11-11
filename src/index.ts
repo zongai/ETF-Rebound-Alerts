@@ -8,7 +8,13 @@ const DEFAULT_WATCH: WatchItem[] = [
   { symbol: "510300", name: "沪深300ETF", secid: "1.510300" },
   { symbol: "510050", name: "上证50ETF", secid: "1.510050" },
   { symbol: "510500", name: "中证500ETF", secid: "1.510500" },
-  { symbol: "159915", name: "创业板ETF", secid: "0.159915" }
+  { symbol: "159915", name: "创业板ETF", secid: "0.159915" },
+  { symbol: "512100", name: "中证1000ETF", secid: "1.512100" },
+  { symbol: "050025", name: "博时标普500ETF联接A", secid: "150.050025" },
+  { symbol: "000834", name: "大成纳斯达克100ETF联接A", secid: "150.000834" },
+  { symbol: "018044", name: "天弘纳斯达克100指数C", secid: "150.018044" },
+  { symbol: "017290", name: "中欧科创主题混合C", secid: "150.017290" },
+  { symbol: "007729", name: "招商普盛全球配置A", secid: "150.007729" }
 ];
 
 function getWatchlist(env: Env): WatchItem[] {
