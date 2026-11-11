@@ -3,7 +3,7 @@ import { fetchBars } from "./data";
 import { isOtcFund } from "./fund";
 import { calculateIndicators, calculateWeekly } from "./indicators";
 import { sendBark } from "./bark";
-import { adminHtml } from "./admin.html";
+import { adminHtml } from "./adminPage";
 
 /** Fallback when WATCHLIST env is missing or invalid. */
 const DEFAULT_WATCH: WatchItem[] = [
